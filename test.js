@@ -1,9 +1,9 @@
 const puppeteer = require('puppeteer')
-const delay = 20;
+const delay = 0;
 
 async function main() {
   const browser = await puppeteer.launch(
-    {headless: false, devtools: true, slowMo: delay});
+    {headless: true, devtools: false, slowMo: delay});
   const page = await browser.newPage();
   const max_iterations = 10;
   await page.goto('https://www.opentable.com/promo.aspx?pid=69&m=8');
@@ -23,6 +23,13 @@ async function main() {
         if (delay != 0) r.scrollIntoView()
         row = {};
         row['name'] = r.querySelector('.rest-name').innerText;
+        booking = r.querySelector('.booking')
+        if (booking != null) {
+            row['booking'] = parseInt(booking.innerText.match(/Booked (\d+) times today/)[1]);
+        }
+        else {
+            row['booking'] = 0;
+        }
         rows.push(row);
         await sleep(delay);
       }
@@ -41,6 +48,9 @@ async function main() {
     }
   }
   console.log("Restaurant count: ", all_rows.length);
+  all_rows.sort((a,b) => b['booking'] - a['booking']);
+  console.log("Top Restaurants: ", all_rows.slice(0, 10));
+
 
   //await browser.close();
 }
