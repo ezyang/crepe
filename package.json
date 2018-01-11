@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "papaparse": "^4.3.6",
     "puppeteer": "^0.13.0"
   }
 }

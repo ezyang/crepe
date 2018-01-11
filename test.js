@@ -1,9 +1,15 @@
-const puppeteer = require('puppeteer')
+const puppeteer = require('puppeteer');
+const papaparse = require('papaparse');
+const fs = require('fs');
+
+const fast = true;
 const delay = 0;
 
 async function main() {
+
+
   const browser = await puppeteer.launch(
-    {headless: true, devtools: false, slowMo: delay});
+    {headless: fast, devtools: !fast, slowMo: delay});
   const page = await browser.newPage();
   const max_iterations = 10;
   await page.goto('https://www.opentable.com/promo.aspx?pid=69&m=8');
@@ -51,8 +57,15 @@ async function main() {
   all_rows.sort((a,b) => b['booking'] - a['booking']);
   console.log("Top Restaurants: ", all_rows.slice(0, 10));
 
+  fs.writeFile('data.csv', papaparse.unparse(all_rows), function(err) {
+    if (err) {
+      return console.log(err);
+    }
+  });
 
-  //await browser.close();
+  if (fast) {
+    await browser.close();
+  }
 }
 
 main();
